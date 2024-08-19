@@ -5,28 +5,25 @@ def conectar_banco():
     return mysql.connector.connect(
         host='localhost',
         user='root',
-        password='#umdoistres',
+        password='batatadoce123',
         database='farmacia'
     )
 
 
 def criar_medicamento(cursor, nome_medicamento, fabricante, quantidade, valor):
-    comando = f'INSERT INTO medicamentos (nome_medicamento, fabricante, quantidade, valor) VALUES ("{
-        nome_medicamento}", "{fabricante}", {quantidade}, {valor})'
+    comando = f'INSERT INTO medicamentos (nome_medicamento, fabricante, quantidade, valor) VALUES ("{nome_medicamento}", "{fabricante}", {quantidade}, {valor})'
     cursor.execute(comando)
     print('Medicamento cadastrado com sucesso!')
 
 
 def alterar_valor(cursor, id_medicamento, valor):
-    comando = f'UPDATE medicamentos SET valor = {
-        valor} WHERE idMedicamento = {id_medicamento}'
+    comando = f'UPDATE medicamentos SET valor = {valor} WHERE idMedicamento = {id_medicamento}'
     cursor.execute(comando)
     print('Valor atualizado com sucesso!')
 
 
 def pesquisar_por_id(cursor, id_medicamento):
-    comando = f'SELECT * FROM medicamentos WHERE idMedicamento = {
-        id_medicamento}'
+    comando = f'SELECT * FROM medicamentos WHERE idMedicamento = {id_medicamento}'
     cursor.execute(comando)
     resultado = cursor.fetchall()
     if resultado:
@@ -37,8 +34,7 @@ def pesquisar_por_id(cursor, id_medicamento):
 
 
 def remover_medicamento(cursor, id_medicamento):
-    comando = f'DELETE FROM medicamentos WHERE idMedicamento = {
-        id_medicamento}'
+    comando = f'DELETE FROM medicamentos WHERE idMedicamento = {id_medicamento}'
     cursor.execute(comando)
     print('Medicamento removido com sucesso!')
 
@@ -55,8 +51,7 @@ def exibir_todos(cursor):
 
 
 def exibir_um(cursor, id_medicamento):
-    comando = f'SELECT * FROM medicamentos WHERE idMedicamento = {
-        id_medicamento}'
+    comando = f'SELECT * FROM medicamentos WHERE idMedicamento = {id_medicamento}'
     cursor.execute(comando)
     resultado = cursor.fetchall()
     if resultado:
