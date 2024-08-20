@@ -1,3 +1,4 @@
+# Criação da tabela "medicamentos" e suas respectivas colunas
 DROP TABLE IF EXISTS `medicamentos`;
 
 CREATE TABLE farmacia.medicamentos (
