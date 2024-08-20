@@ -37,10 +37,18 @@ def pesquisar_por_id(cursor, id_medicamento):
 
 
 def remover_medicamento(cursor, id_medicamento):
-    comando = f'DELETE FROM medicamentos WHERE idMedicamento = {
+    comando_busca = f'SELECT * FROM medicamentos WHERE idMedicamento = {
         id_medicamento}'
-    cursor.execute(comando)
-    print('Medicamento removido com sucesso!')
+    cursor.execute(comando_busca)
+    resultado = cursor.fetchall()
+
+    if not resultado:
+        print('Medicamento não encontrado.')
+    else:
+        comando_remover = f'DELETE FROM medicamentos WHERE idMedicamento = {
+            id_medicamento}'
+        cursor.execute(comando_remover)
+        print('Medicamento removido com sucesso!')
 
 
 def exibir_todos(cursor):
@@ -118,7 +126,7 @@ def main():
             break
 
         else:
-            print("Deixe de ser burro, escolha uma opção VÁLIDA.")
+            print("Opção inválida. Por favor, escolha uma opção válida.")
 
     cursor.close()
     conexao.close()
