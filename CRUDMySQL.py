@@ -1,11 +1,10 @@
 import mysql.connector
 
-
 def conectar_banco():
     return mysql.connector.connect(
         host='localhost',
         user='root',
-        password='#umdoistres',
+        password='root',
         database='farmacia'
     )
 
@@ -101,9 +100,15 @@ def main():
 
         elif escolha == '2':
             id_medicamento = int(input("ID do medicamento: "))
-            valor = float(input("Novo valor: "))
-            alterar_valor(cursor, id_medicamento, valor)
-            conexao.commit()
+            cursor.execute(f'SELECT * FROM medicamentos WHERE idMedicamento = {id_medicamento}')
+            resultado = cursor.fetchone()
+            
+            if resultado:
+                valor = float(input("Novo valor: "))
+                alterar_valor(cursor, id_medicamento, valor)
+                conexao.commit()
+            else:
+                print('Erro: Medicamento não encontrado. Nenhuma alteração foi feita.')
 
         elif escolha == '3':
             id_medicamento = int(input("ID do medicamento: "))
