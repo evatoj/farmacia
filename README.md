@@ -1,2 +1,2 @@
 # bancodedados
-Sistema de farmácia utilizando Python e MySQL.
+CRUD com temática de farmácia desenvolvido utilizando Python e MySQL.
