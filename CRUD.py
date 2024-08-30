@@ -14,9 +14,9 @@ def criar_medicamento(nome_medicamento, fabricante, quantidade, valor):
     try:
         conexao = conectar_banco()
         cursor = conexao.cursor()
-        comando = f'INSERT INTO medicamentos (nome_medicamento, fabricante, quantidade, valor) VALUES ("{
-            nome_medicamento}", "{fabricante}", {quantidade}, {valor})'
-        cursor.execute(comando)
+        comando = 'INSERT INTO medicamentos (nome_medicamento, fabricante, quantidade, valor) VALUES (%s, %s, %s, %s)'
+        cursor.execute(comando, (nome_medicamento,
+                       fabricante, quantidade, valor))
         conexao.commit()
         cursor.close()
         conexao.close()
@@ -32,7 +32,6 @@ def alterar_medicamento(id_medicamento, coluna, novo_valor):
 
         comando = f'UPDATE medicamentos SET {
             coluna} = %s WHERE idMedicamento = %s'
-
         cursor.execute(comando, (novo_valor, id_medicamento))
         linhas_afetadas = cursor.rowcount
         conexao.commit()
@@ -65,9 +64,8 @@ def remover_medicamento(id_medicamento):
     try:
         conexao = conectar_banco()
         cursor = conexao.cursor()
-        comando = f'DELETE FROM medicamentos WHERE idMedicamento = {
-            id_medicamento}'
-        cursor.execute(comando)
+        comando = 'DELETE FROM medicamentos WHERE idMedicamento = %s'
+        cursor.execute(comando, (id_medicamento,))
         conexao.commit()
 
         if cursor.rowcount == 0:
@@ -100,9 +98,8 @@ def exibir_um(id_medicamento):
     try:
         conexao = conectar_banco()
         cursor = conexao.cursor()
-        comando = f'SELECT * FROM medicamentos WHERE idMedicamento = {
-            id_medicamento}'
-        cursor.execute(comando)
+        comando = 'SELECT * FROM medicamentos WHERE idMedicamento = %s'
+        cursor.execute(comando, (id_medicamento,))
         resultado = cursor.fetchall()
         cursor.close()
         conexao.close()
