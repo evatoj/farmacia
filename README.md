@@ -1,2 +1,2 @@
-# bancodedados
+# 'farmacia'
 CRUD com temática de farmácia desenvolvido utilizando Python e MySQL.
