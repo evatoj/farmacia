@@ -6,7 +6,7 @@ def tela_vendedor():
     cursor = db.cursor()
 
     while True:
-        print("\n=== Tela do Vendedor ===")
+        print("\n=== Área do Vendedor ===")
         print("1. Inserir Medicamento")
         print("2. Alterar Preço")
         print("3. Exibir Medicamento por ID")

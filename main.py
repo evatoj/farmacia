@@ -4,6 +4,7 @@ from login_cliente import login_cliente
 from login_vendedor import login_vendedor
 from tela_vendedor import tela_vendedor
 from tela_anonima import tela_anonima
+from tela_cliente import tela_cliente
 
 
 def main():
@@ -23,7 +24,9 @@ def main():
         elif opcao == '2':
             cadastrar_vendedor()
         elif opcao == '3':
-            login_cliente()
+            email_cliente = login_cliente()
+            if email_cliente:
+                tela_cliente(email_cliente)
         elif opcao == '4':
             if login_vendedor():
                 tela_vendedor()

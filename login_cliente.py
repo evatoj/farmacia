@@ -25,13 +25,13 @@ def login_cliente():
                 print(
                     "Você é cliente especial e terá 10% de desconto nas suas compras :)!")
 
-            return True
+            return email
         else:
             print("Senha incorreta!")
-            return False
+            return None
     else:
         print("Login inexistente!")
-        return False
+        return None
 
     cursor.close()
     db.close()

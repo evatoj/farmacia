@@ -3,7 +3,7 @@ from conexao import conectar_banco
 
 def tela_anonima():
     while True:
-        print("\n=== Tela Anônima ===")
+        print("\n=== Navegação Anônima ===")
         print("1. Visualizar Produtos")
         print("2. Consultar Produtos")
         print("3. Listar Clientes")
