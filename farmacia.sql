@@ -1,58 +1,55 @@
 CREATE DATABASE IF NOT EXISTS farmacia;
 USE farmacia;
-
+CREATE TABLE  IF NOT EXISTS cliente (
+  id_cli int NOT NULL AUTO_INCREMENT
+  cpf_cli varchar(11) NOT NULL,
+  nome_cli varchar(255) NOT NULL,
+  email_cli varchar(255) NOT NULL,
+  senha_cli varchar(255) NOT NULL,
+  telefone_cli varchar(20) DEFAULT NULL,
+  cidade_cli varchar(100) NOT NULL,
+  torce_flamengo tinyint(1) NOT NULL,
+  assiste_one_piece tinyint(1) NOT NULL,
+  PRIMARY KEY (id_cli),
+  UNIQUE KEY email_cli (email_cli)
+);
+USE farmacia;
 CREATE TABLE IF NOT EXISTS medicamento (
-  medicamento_id INT AUTO_INCREMENT PRIMARY KEY,
-  nome VARCHAR(255) NOT NULL,
-  categoria VARCHAR(255),
-  preco DECIMAL(10, 2) NOT NULL,
-  quantidade_em_estoque INT NOT NULL,
-  fabricado_em_mari BOOLEAN
-)
-
-CREATE TABLE IF NOT EXISTS cliente (
-  cliente_id INT AUTO_INCREMENT PRIMARY KEY,
-  nome VARCHAR(255) NOT NULL,
-  endereco VARCHAR(255),
-  email VARCHAR(255),
-  telefone VARCHAR(50),
-  torcedor_flamengo BOOLEAN,
-  assiste_one_piece BOOLEAN,
-  cidade VARCHAR(255)
-)
-
+  id_med int NOT NULL AUTO_INCREMENT,
+  nome_med varchar(50) DEFAULT NULL,
+  fabricante varchar(50) DEFAULT NULL,
+  estoque int DEFAULT NULL,
+  preco decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (id_med),
+  UNIQUE KEY idMedicamento_UNIQUE (id_med)
+);
+USE farmacia;
 CREATE TABLE IF NOT EXISTS vendedor (
-  vendedor_id INT AUTO_INCREMENT PRIMARY KEY,
-  nome VARCHAR(255) NOT NULL,
-  email VARCHAR(255)
-)
+  id_ven int NOT NULL AUTO_INCREMENT
+  cpf_ven varchar(11) NOT NULL,
+  nome_ven varchar(255) NOT NULL,
+  email_ven varchar(255) NOT NULL,
+  senha_ven varchar(255) NOT NULL,
+  telefone_ven varchar(20) DEFAULT NULL,
+  PRIMARY KEY (id_ven),
+  UNIQUE KEY email_ven (email_ven)
+);
 
-CREATE TABLE IF NOT EXISTS venda (
-  venda_id INT AUTO_INCREMENT PRIMARY KEY,
-  cliente_id INT,
-  vendedor_id INT,
-  data_venda DATE,
-  forma_pagamento VARCHAR(50),
-  status_pagamento VARCHAR(50),
-  desconto_aplicado DECIMAL(10, 2),
-  FOREIGN KEY (cliente_id) REFERENCES cliente(cliente_id),
-  FOREIGN KEY (vendedor_id) REFERENCES vendedor(vendedor_id)
-)
-
-CREATE TABLE IF NOT EXISTS itemVenda (
-  item_venda_id INT AUTO_INCREMENT PRIMARY KEY,
-  venda_id INT,
-  medicamento_id INT,
-  quantidade INT,
-  preco_unitario DECIMAL(10, 2),
-  total_item DECIMAL(10, 2),
-  FOREIGN KEY (venda_id) REFERENCES venda(venda_id),
-  FOREIGN KEY (medicamento_id) REFERENCES medicamento(medicamento_id)
-)
-
-CREATE TABLE IF NOT EXISTS estoque (
-  estoque_id INT AUTO_INCREMENT PRIMARY KEY,
-  medicamento_id INT,
-  quantidade_disponivel INT,
-  FOREIGN KEY (medicamento_id) REFERENCES medicamento(medicamento_id)
-)
+-- stored procedure para relatorio mensal do vendedor
+DELIMITER //
+CREATE PROCEDURE relatorio_mensal_vendedor(IN vendedor_id INT, IN ano_mes VARCHAR(7))
+BEGIN
+    SELECT 
+        v.vendedor_id,
+        ven.nome AS nome_vendedor,
+        DATE_FORMAT(v.data_venda, '%Y-%m') AS mes_venda,
+        COUNT(v.id) AS total_vendas,
+        SUM(iv.quantidade) AS total_itens_vendidos,
+        SUM(iv.quantidade * iv.preco_unitario) AS total_valor
+    FROM vendas v
+    JOIN vendedores ven ON v.vendedor_id = ven.id
+    JOIN itens_venda iv ON iv.venda_id = v.id
+    WHERE v.vendedor_id = vendedor_id AND DATE_FORMAT(v.data_venda, '%Y-%m') = ano_mes
+    GROUP BY v.vendedor_id, mes_venda;
+END //
+DELIMITER ;
