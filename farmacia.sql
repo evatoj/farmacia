@@ -40,16 +40,16 @@ DELIMITER //
 CREATE PROCEDURE relatorio_mensal_vendedor(IN vendedor_id INT, IN ano_mes VARCHAR(7))
 BEGIN
     SELECT 
-        v.vendedor_id,
-        ven.nome AS nome_vendedor,
+        v.id_ven,
+        ven.nome_ven AS nome_ven,
         DATE_FORMAT(v.data_venda, '%Y-%m') AS mes_venda,
         COUNT(v.id) AS total_vendas,
         SUM(iv.quantidade) AS total_itens_vendidos,
         SUM(iv.quantidade * iv.preco_unitario) AS total_valor
     FROM vendas v
-    JOIN vendedores ven ON v.vendedor_id = ven.id
+    JOIN vendedor ven ON v.id_ven = ven.id_ven
     JOIN itens_venda iv ON iv.venda_id = v.id
-    WHERE v.vendedor_id = vendedor_id AND DATE_FORMAT(v.data_venda, '%Y-%m') = ano_mes
-    GROUP BY v.vendedor_id, mes_venda;
+    WHERE v.id_ven = id_ven AND DATE_FORMAT(v.data_venda, '%Y-%m') = ano_mes
+    GROUP BY v.id_ven, mes_venda;
 END //
 DELIMITER ;
