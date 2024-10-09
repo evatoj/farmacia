@@ -25,24 +25,25 @@ def ver_dados_cadastrais(email):
     cursor = db.cursor()
 
     cursor.execute(
-        "SELECT cpf_cli, nome_cli, email_cli, telefone_cli, cidade_cli, torce_flamengo, assiste_one_piece "
+        "SELECT id_cli, cpf_cli, nome_cli, email_cli, telefone_cli, cidade_cli, torce_flamengo, assiste_one_piece "
         "FROM cliente WHERE email_cli = %s", (email,))
     cliente = cursor.fetchone()
 
     if cliente:
         print("\n=== Dados Cadastrais ===")
-        print(f"CPF: {cliente[0]}")
-        print(f"Nome: {cliente[1]}")
-        print(f"Email: {cliente[2]}")
-        print(f"Telefone: {cliente[3]}")
-        print(f"Cidade: {cliente[4]}")
+        print(f"ID: {cliente[0]}")
+        print(f"CPF: {cliente[1]}")
+        print(f"Nome: {cliente[2]}")
+        print(f"Email: {cliente[3]}")
+        print(f"Telefone: {cliente[4]}")
+        print(f"Cidade: {cliente[5]}")
 
-        if cliente[5]:
+        if cliente[6]:
             print("Torce para o Flamengo: Sim")
         else:
             print("Torce para o Flamengo: Não")
 
-        if cliente[6]:
+        if cliente[7]:
             print("Assiste One Piece: Sim")
         else:
             print("Assiste One Piece: Não")

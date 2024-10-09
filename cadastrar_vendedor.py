@@ -20,7 +20,6 @@ def validar_cpf(cpf):
 
 
 def validar_email(email):
-
     padrao_email = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     if not re.match(padrao_email, email):
         print("Formato de email inválido.")
@@ -62,13 +61,14 @@ def cadastrar_vendedor():
     nome = input("Digite o nome do vendedor: ")
     senha = input("Digite a senha do vendedor: ")
     telefone = input("Digite o telefone do vendedor: ")
+    cidade = input("Digite a cidade do vendedor: ")
 
     senha_criptografada = gerar_senha_criptografada(senha)
 
     cursor.execute("""
-        INSERT INTO vendedor (cpf_ven, nome_ven, email_ven, senha_ven, telefone_ven)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (cpf, nome, email, senha_criptografada, telefone))
+        INSERT INTO vendedor (cpf_ven, nome_ven, email_ven, senha_ven, telefone_ven, cidade_ven)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, (cpf, nome, email, senha_criptografada, telefone, cidade))
 
     db.commit()
     print("Vendedor contratado com sucesso!")

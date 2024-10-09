@@ -13,20 +13,28 @@ def login_vendedor():
     email = input("Digite seu email: ")
     senha = input("Digite sua senha: ")
 
-    cursor.execute("SELECT * FROM vendedor WHERE email_ven = %s", (email,))
+    cursor.execute(
+        "SELECT id_ven, cpf_ven, nome_ven, senha_ven FROM vendedor WHERE email_ven = %s", (email,))
     vendedor = cursor.fetchone()
 
     if vendedor:
+        id_ven = vendedor[0]
+        cpf_ven = vendedor[1]
+        nome_ven = vendedor[2]
         senha_hash = vendedor[3]
+
         if verificar_senha(senha, senha_hash):
-            print(f"Login bem-sucedido! Bem-vindo(a), {vendedor[1]}")
-            return True
+            print("\n=== Login bem-sucedido ===")
+            print(f"ID: {id_ven}")
+            print(f"CPF: {cpf_ven}")
+            print(f"Bem-vindo(a), {nome_ven}!")
+            return id_ven
         else:
             print("Senha incorreta!")
-            return False
+            return None
     else:
-        print("Login inexistente!")
-        return False
+        print("Email inexistente!")
+        return None
 
     cursor.close()
     db.close()

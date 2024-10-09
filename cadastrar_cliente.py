@@ -31,7 +31,6 @@ def validar_cpf(cpf):
 
 
 def validar_email(email):
-
     padrao_email = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     if not re.match(padrao_email, email):
         print("Formato de email inválido.")
@@ -82,7 +81,7 @@ def cadastrar_cliente():
 
     senha_criptografada = gerar_senha_criptografada(senha)
 
-    cursor.execute("""
+    cursor.execute(""" 
         INSERT INTO cliente (cpf_cli, nome_cli, email_cli, senha_cli, telefone_cli, cidade_cli, torce_flamengo, assiste_one_piece)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     """, (cpf, nome, email, senha_criptografada, telefone, cidade, torce_flamengo, assiste_one_piece))

@@ -64,7 +64,7 @@ def listar_clientes():
     db = conectar_banco()
     cursor = db.cursor()
     cursor.execute(
-        "SELECT nome_cli, email_cli, telefone_cli, cidade_cli FROM cliente")
+        "SELECT id_cli, nome_cli, email_cli, cidade_cli, telefone_cli FROM cliente")
     clientes = cursor.fetchall()
     for cliente in clientes:
         print(cliente)
@@ -75,7 +75,8 @@ def listar_clientes():
 def listar_vendedores():
     db = conectar_banco()
     cursor = db.cursor()
-    cursor.execute("SELECT nome_ven, email_ven, telefone_ven FROM vendedor")
+    cursor.execute(
+        "SELECT nome_ven, email_ven, cidade_ven, telefone_ven FROM vendedor")
     vendedores = cursor.fetchall()
     for vendedor in vendedores:
         print(vendedor)

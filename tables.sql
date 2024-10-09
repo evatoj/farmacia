@@ -16,6 +16,7 @@ CREATE TABLE `medicamento` (
 -- Tabela cliente --
 
 CREATE TABLE `cliente` (
+  `id_cli` int NOT NULL AUTO_INCREMENT,
   `cpf_cli` varchar(11) NOT NULL,
   `nome_cli` varchar(255) NOT NULL,
   `email_cli` varchar(255) NOT NULL,
@@ -24,20 +25,24 @@ CREATE TABLE `cliente` (
   `cidade_cli` varchar(100) NOT NULL,
   `torce_flamengo` tinyint(1) NOT NULL,
   `assiste_one_piece` tinyint(1) NOT NULL,
-  PRIMARY KEY (`cpf_cli`),
+  PRIMARY KEY (`id_cli`),
   UNIQUE KEY `email_cli` (`email_cli`),
-  UNIQUE KEY `cpf_cli_UNIQUE` (`cpf_cli`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+  UNIQUE KEY `cpf_cli_UNIQUE` (`cpf_cli`),
+  UNIQUE KEY `id_cli_UNIQUE` (`id_cli`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
 -- Tabela vendedor --
 
 CREATE TABLE `vendedor` (
+  `id_ven` int NOT NULL AUTO_INCREMENT,
   `cpf_ven` varchar(11) NOT NULL,
   `nome_ven` varchar(255) NOT NULL,
   `email_ven` varchar(255) NOT NULL,
   `senha_ven` varchar(255) NOT NULL,
   `telefone_ven` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`cpf_ven`),
+  `cidade_ven` varchar(100) NOT NULL,
+  PRIMARY KEY (`id_ven`),
   UNIQUE KEY `email_ven` (`email_ven`),
-  UNIQUE KEY `cpf_ven_UNIQUE` (`cpf_ven`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+  UNIQUE KEY `cpf_ven_UNIQUE` (`cpf_ven`),
+  UNIQUE KEY `id_ven_UNIQUE` (`id_ven`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
