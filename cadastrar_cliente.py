@@ -1,5 +1,6 @@
 from conexao import conectar_banco
 import bcrypt
+import re
 
 
 def gerar_senha_criptografada(senha):
@@ -16,16 +17,60 @@ def solicitar_input_valido(pergunta):
         elif resposta == 'n':
             return False
         else:
-            print("Entrada inválida! Por favor, digite 's' para sim ou 'n' para não.")
+            print("Entrada inválida! Por favor, digite 's' para sim ou 'n'.")
+
+
+def validar_cpf(cpf):
+    if len(cpf) != 11:
+        print("O CPF deve conter exatamente 11 dígitos.")
+        return False
+    if not cpf.isdigit():
+        print("O CPF deve conter apenas números.")
+        return False
+    return True
+
+
+def validar_email(email):
+
+    padrao_email = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    if not re.match(padrao_email, email):
+        print("Formato de email inválido.")
+        return False
+    return True
+
+
+def cpf_unico(cursor, cpf):
+    cursor.execute("SELECT cpf_cli FROM cliente WHERE cpf_cli = %s", (cpf,))
+    if cursor.fetchone():
+        print("Este CPF já está cadastrado.")
+        return False
+    return True
+
+
+def email_unico(cursor, email):
+    cursor.execute(
+        "SELECT email_cli FROM cliente WHERE email_cli = %s", (email,))
+    if cursor.fetchone():
+        print("Este email já está cadastrado.")
+        return False
+    return True
 
 
 def cadastrar_cliente():
     db = conectar_banco()
     cursor = db.cursor()
 
-    cpf = input("Digite o CPF do cliente (somente números): ")
+    while True:
+        cpf = input("Digite o CPF do cliente (somente números): ")
+        if validar_cpf(cpf) and cpf_unico(cursor, cpf):
+            break
+
+    while True:
+        email = input("Digite o email do cliente: ")
+        if validar_email(email) and email_unico(cursor, email):
+            break
+
     nome = input("Digite o nome do cliente: ")
-    email = input("Digite o email do cliente: ")
     senha = input("Digite a senha do cliente: ")
     telefone = input("Digite o telefone do cliente: ")
     cidade = input("Digite a cidade do cliente: ")

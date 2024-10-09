@@ -4,16 +4,16 @@ from conexao import conectar_banco
 def tela_anonima():
     while True:
         print("\n=== Navegação Anônima ===")
-        print("1. Visualizar Produtos")
+        print("1. Listar Medicamentos Disponíveis")
         print("2. Consultar Produtos")
         print("3. Listar Clientes")
         print("4. Listar Vendedores")
-        print("5. Voltar ao Menu Principal")
+        print("5. Menu Inicial")
 
         opcao = input("Escolha uma opção: ")
 
         if opcao == '1':
-            visualizar_produtos()
+            listar_medicamentos_disponiveis()
         elif opcao == '2':
             consultar_produtos()
         elif opcao == '3':
@@ -26,15 +26,18 @@ def tela_anonima():
             print("Opção inválida. Tente novamente.")
 
 
-def visualizar_produtos():
+def listar_medicamentos_disponiveis():
     db = conectar_banco()
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM medicamento")
+    cursor.execute("SELECT * FROM estoque_disponivel")
     produtos = cursor.fetchall()
-    for produto in produtos:
-        id_med, nome_med, fabricante, estoque, preco = produto
-        print(f"ID: {id_med}, Nome: {nome_med}, Fabricante: {
-              fabricante}, Estoque: {estoque}, Preço: R${preco:.2f}")
+    if produtos:
+        for produto in produtos:
+            id_med, nome_med, fabricante, estoque, preco = produto
+            print(f"ID: {id_med}, Nome: {nome_med}, Fabricante: {
+                  fabricante}, Estoque: {estoque}, Preço: R${preco:.2f}")
+    else:
+        print("Nenhum medicamento disponível.")
     cursor.close()
     db.close()
 
@@ -48,7 +51,6 @@ def consultar_produtos():
     produtos = cursor.fetchall()
     if produtos:
         for produto in produtos:
-
             id_med, nome_med, fabricante, estoque, preco = produto
             print(f"ID: {id_med}, Nome: {nome_med}, Fabricante: {
                   fabricante}, Estoque: {estoque}, Preço: R${preco:.2f}")

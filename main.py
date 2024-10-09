@@ -33,7 +33,7 @@ def main():
         elif opcao == '5':
             tela_anonima()
         elif opcao == '6':
-            print("Encerrando o sistema.")
+            print("Obrigado pela sua preferência :D\nEncerrando o sistema...")
             break
         else:
             print("Opção inválida. Tente novamente.")
