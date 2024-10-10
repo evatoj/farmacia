@@ -46,3 +46,19 @@ CREATE TABLE `vendedor` (
   UNIQUE KEY `cpf_ven_UNIQUE` (`cpf_ven`),
   UNIQUE KEY `id_ven_UNIQUE` (`id_ven`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+-- Tabela gerente --
+
+CREATE TABLE `gerente` (
+  `id_ger` int NOT NULL AUTO_INCREMENT,
+  `cpf_ger` varchar(11) NOT NULL,
+  `nome_ger` varchar(255) NOT NULL,
+  `email_ger` varchar(255) NOT NULL,
+  `senha_ger` varchar(255) NOT NULL,
+  `cidade_ger` varchar(100) NOT NULL,
+  `telefone_ger` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id_ger`),
+  UNIQUE KEY `id_ger_UNIQUE` (`id_ger`),
+  UNIQUE KEY `cpf_ger_UNIQUE` (`cpf_ger`),
+  UNIQUE KEY `email_ger_UNIQUE` (`email_ger`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
