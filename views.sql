@@ -22,3 +22,10 @@ CREATE VIEW estoque_zerado AS
 SELECT *
 FROM medicamento
 WHERE estoque = 0;
+
+-- View para verificar vendedores demitidos (status_ven = 0) --
+
+CREATE VIEW vendedor_demitido AS
+SELECT id_ven, cpf_ven, nome_ven, email_ven, cidade_ven, telefone_ven
+FROM vendedor
+WHERE status_ven = 0;

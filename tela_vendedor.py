@@ -114,7 +114,7 @@ def tela_vendedor():
                       medicamento[2]}, Estoque: {medicamento[3]}, Preço: R${medicamento[4]:.2f}")
 
         elif opcao == '6':
-            print("Saindo da tela do vendedor.")
+            print("Retornando ao Menu Inicial...\n")
             break
 
         else:

@@ -39,19 +39,34 @@ def validar_email(email):
 
 
 def cpf_unico(cursor, cpf):
+
     cursor.execute("SELECT cpf_cli FROM cliente WHERE cpf_cli = %s", (cpf,))
     if cursor.fetchone():
-        print("Este CPF já está cadastrado.")
+        print("Este CPF já está cadastrado na tabela cliente.")
         return False
+
+    cursor.execute("SELECT cpf_ven FROM vendedor WHERE cpf_ven = %s", (cpf,))
+    if cursor.fetchone():
+        print("Este CPF já está cadastrado na tabela vendedor.")
+        return False
+
     return True
 
 
 def email_unico(cursor, email):
+
     cursor.execute(
         "SELECT email_cli FROM cliente WHERE email_cli = %s", (email,))
     if cursor.fetchone():
-        print("Este email já está cadastrado.")
+        print("Este email já está cadastrado na tabela cliente.")
         return False
+
+    cursor.execute(
+        "SELECT email_ven FROM vendedor WHERE email_ven = %s", (email,))
+    if cursor.fetchone():
+        print("Este email já está cadastrado na tabela vendedor.")
+        return False
+
     return True
 
 

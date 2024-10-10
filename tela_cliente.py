@@ -15,6 +15,7 @@ def tela_cliente(email):
         elif opcao == '2':
             ver_medicamentos_disponiveis()
         elif opcao == '3':
+            print("Retornando ao Menu Inicial...\n")
             break
         else:
             print("Opção inválida. Tente novamente.")

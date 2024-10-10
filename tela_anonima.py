@@ -21,6 +21,7 @@ def tela_anonima():
         elif opcao == '4':
             listar_vendedores()
         elif opcao == '5':
+            print("Retornando ao Menu Inicial...\n")
             break
         else:
             print("Opção inválida. Tente novamente.")
