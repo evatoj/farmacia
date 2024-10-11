@@ -8,3 +8,10 @@ class Medicamento:
 
     def __str__(self):
         return f"Medicamento: {self.nome_med} - Fabricante: {self.fabricante} - Preço: R${self.preco:.2f}"
+    
+    def atualizar_estoque(self, quantidade):
+        if quantidade < 0 and abs(quantidade) > self.estoque:
+            print(f"Não há estoque suficiente de {self.nome_med}.")
+        else:
+            self.estoque += quantidade
+            print(f"Estoque de {self.nome_med} atualizado para {self.estoque}.")
