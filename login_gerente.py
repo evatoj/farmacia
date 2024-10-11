@@ -13,8 +13,11 @@ def validar_login(email, senha):
 
         if resultado:
             senha_armazenada = resultado[0]
-
-            if bcrypt.checkpw(senha.encode('utf-8'), senha_armazenada.encode('utf-8')):
+            print(senha)
+            print(senha_armazenada)
+            # if bcrypt.checkpw(senha.encode('utf-8'), senha_armazenada.encode('utf-8')):
+            #     return True
+            if senha == senha_armazenada:
                 return True
         return False
     finally:
