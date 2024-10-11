@@ -12,5 +12,6 @@ def conectar_banco():
         )
         return db
     except Error as e:
-        print(f"Não foi possível se conectar ao banco de dados: {e}")
+        print(
+            f"Não foi possível se conectar ao banco de dados, verifique se o serviço MySQL80 foi iniciado e tente novamente.\n {e}")
         return None

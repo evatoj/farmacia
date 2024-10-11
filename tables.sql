@@ -41,11 +41,12 @@ CREATE TABLE `vendedor` (
   `senha_ven` varchar(255) NOT NULL,
   `telefone_ven` varchar(20) DEFAULT NULL,
   `cidade_ven` varchar(100) NOT NULL,
+  `status_ven` tinyint DEFAULT '1',
   PRIMARY KEY (`id_ven`),
   UNIQUE KEY `email_ven` (`email_ven`),
   UNIQUE KEY `cpf_ven_UNIQUE` (`cpf_ven`),
   UNIQUE KEY `id_ven_UNIQUE` (`id_ven`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
 -- Tabela gerente --
 
