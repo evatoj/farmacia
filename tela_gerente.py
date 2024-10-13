@@ -1,6 +1,7 @@
 from conexao import conectar_banco
 import bcrypt
 import re
+from prettytable import PrettyTable
 
 
 def tela_gerente():
@@ -9,10 +10,11 @@ def tela_gerente():
         print("1. Listar Vendedores Ativos")
         print("2. Listar Vendedores Demitidos")
         print("3. Listar Clientes")
-        print("4. Contratar Vendedor")
+        print("4. Cadastrar Vendedor")
         print("5. Demitir Vendedor")
         print("6. Recontratar Vendedor")
-        print("7. Menu Inicial")
+        print("7. Alterar Salário de Vendedor")
+        print("8. Menu Inicial")
 
         opcao = input("Escolha uma opção: ")
 
@@ -29,6 +31,8 @@ def tela_gerente():
         elif opcao == '6':
             recontratar_vendedor()
         elif opcao == '7':
+            alterar_salario_vendedor()
+        elif opcao == '8':
             print("Retornando ao Menu Inicial...\n")
             break
         else:
@@ -107,13 +111,14 @@ def cadastrar_vendedor():
     senha = input("Digite a senha do vendedor: ")
     telefone = input("Digite o telefone do vendedor: ")
     cidade = input("Digite a cidade do vendedor: ")
+    salario = input("Digite o salário do vendedor: ")
 
     senha_criptografada = gerar_senha_criptografada(senha)
 
     cursor.execute(""" 
-        INSERT INTO vendedor (cpf_ven, nome_ven, email_ven, senha_ven, telefone_ven, cidade_ven, status_ven) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s) 
-    """, (cpf, nome, email, senha_criptografada, telefone, cidade, 1))  # status_ven = 1 (ativo)
+        INSERT INTO vendedor (cpf_ven, nome_ven, email_ven, senha_ven, telefone_ven, cidade_ven, salario_ven, status_ven) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s) 
+    """, (cpf, nome, email, senha_criptografada, telefone, cidade, salario, 1))
 
     db.commit()
     print("Vendedor contratado com sucesso!")
@@ -170,14 +175,19 @@ def listar_vendedores_ativos():
     db = conectar_banco()
     cursor = db.cursor()
     cursor.execute(
-        "SELECT id_ven, nome_ven, email_ven, cidade_ven, telefone_ven FROM vendedor WHERE status_ven = 1")
+        "SELECT id_ven, cpf_ven, nome_ven, email_ven, cidade_ven, telefone_ven, salario_ven FROM vendedor WHERE status_ven = 1")
     vendedores = cursor.fetchall()
 
     print("\nLista de Vendedores Ativos:")
+    table = PrettyTable()
+    table.field_names = ["ID", "CPF", "Nome",
+                         "Email", "Cidade", "Telefone", "Salário (R$)"]
+
     if vendedores:
         for vendedor in vendedores:
-            print(f"ID: {vendedor[0]}, Nome: {vendedor[1]}, Email: {
-                  vendedor[2]}, Cidade: {vendedor[3]}, Telefone: {vendedor[4]}")
+            table.add_row([vendedor[0], vendedor[1], vendedor[2],
+                          vendedor[3], vendedor[4], vendedor[5], f"{vendedor[6]:.2f}"])
+        print(table)
     else:
         print("Nenhum vendedor ativo cadastrado.")
 
@@ -189,14 +199,19 @@ def listar_vendedores_demitidos():
     db = conectar_banco()
     cursor = db.cursor()
     cursor.execute(
-        "SELECT id_ven, nome_ven, email_ven, cidade_ven, telefone_ven FROM vendedor WHERE status_ven = 0")
+        "SELECT id_ven, cpf_ven, nome_ven, email_ven, cidade_ven, telefone_ven, salario_ven FROM vendedor WHERE status_ven = 0")
     vendedores = cursor.fetchall()
 
     print("\nLista de Vendedores Demitidos:")
+    table = PrettyTable()
+    table.field_names = ["ID", "CPF", "Nome",
+                         "Email", "Cidade", "Telefone", "Salário (R$)"]
+
     if vendedores:
         for vendedor in vendedores:
-            print(f"ID: {vendedor[0]}, Nome: {vendedor[1]}, Email: {
-                  vendedor[2]}, Cidade: {vendedor[3]}, Telefone: {vendedor[4]}")
+            table.add_row([vendedor[0], vendedor[1], vendedor[2],
+                          vendedor[3], vendedor[4], vendedor[5], f"{vendedor[6]:.2f}"])
+        print(table)
     else:
         print("Nenhum vendedor demitido.")
 
@@ -208,16 +223,52 @@ def listar_clientes():
     db = conectar_banco()
     cursor = db.cursor()
     cursor.execute(
-        "SELECT id_cli, nome_cli, email_cli, cidade_cli, telefone_cli FROM cliente")
+        "SELECT id_cli, cpf_cli, nome_cli, email_cli, cidade_cli, telefone_cli FROM cliente")
     clientes = cursor.fetchall()
 
     print("\nLista de Clientes:")
+    table = PrettyTable()
+    table.field_names = ["ID", "CPF", "Nome", "Email", "Cidade", "Telefone"]
+
     if clientes:
         for cliente in clientes:
-            print(f"ID: {cliente[0]}, Nome: {cliente[1]}, Email: {
-                  cliente[2]}, Cidade: {cliente[3]}, Telefone: {cliente[4]}")
+            table.add_row([cliente[0], cliente[1], cliente[2],
+                          cliente[3], cliente[4], cliente[5]])
+        print(table)
     else:
         print("Nenhum cliente cadastrado.")
+
+    cursor.close()
+    db.close()
+
+
+def alterar_salario_vendedor():
+    db = conectar_banco()
+    cursor = db.cursor()
+
+    try:
+        id_ven = input("Digite o ID do vendedor cujo salário será alterado: ")
+
+        cursor.execute(
+            "SELECT nome_ven, salario_ven FROM vendedor WHERE id_ven = %s", (id_ven,))
+        vendedor = cursor.fetchone()
+
+        if vendedor:
+            print(f"Vendedor: {vendedor[0]}")
+            print(f"Salário Atual: R$ {vendedor[1]:.2f}")
+
+            novo_salario = float(input("Digite o novo salário: "))
+
+            cursor.execute(
+                "UPDATE vendedor SET salario_ven = %s WHERE id_ven = %s", (novo_salario, id_ven))
+            db.commit()
+
+            print("Salário atualizado com sucesso!")
+        else:
+            print("Vendedor não encontrado.")
+
+    except ValueError:
+        print("Valor inválido para o salário. Por favor, digite um número válido.")
 
     cursor.close()
     db.close()
