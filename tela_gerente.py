@@ -63,6 +63,16 @@ def validar_email(email):
     return True
 
 
+def validar_telefone(telefone):
+    if len(telefone) != 12:
+        print("O telefone deve conter exatamente 12 dígitos.")
+        return False
+    if not telefone.isdigit():
+        print("O telefone deve conter apenas números.")
+        return False
+    return True
+
+
 def cpf_unico(cursor, cpf):
     cursor.execute("SELECT cpf_ven FROM vendedor WHERE cpf_ven = %s", (cpf,))
     if cursor.fetchone():
@@ -109,7 +119,12 @@ def cadastrar_vendedor():
 
     nome = input("Digite o nome do vendedor: ")
     senha = input("Digite a senha do vendedor: ")
-    telefone = input("Digite o telefone do vendedor: ")
+
+    while True:
+        telefone = input("Digite o telefone do vendedor (somente números): ")
+        if validar_telefone(telefone):
+            break
+
     cidade = input("Digite a cidade do vendedor: ")
     salario = input("Digite o salário do vendedor: ")
 
@@ -262,13 +277,11 @@ def alterar_salario_vendedor():
             cursor.execute(
                 "UPDATE vendedor SET salario_ven = %s WHERE id_ven = %s", (novo_salario, id_ven))
             db.commit()
-
-            print("Salário atualizado com sucesso!")
+            print("Salário alterado com sucesso!")
         else:
             print("Vendedor não encontrado.")
-
     except ValueError:
-        print("Valor inválido para o salário. Por favor, digite um número válido.")
+        print("Valor inválido para o salário.")
 
     cursor.close()
     db.close()

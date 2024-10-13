@@ -38,8 +38,17 @@ def validar_email(email):
     return True
 
 
-def cpf_unico(cursor, cpf):
+def validar_telefone(telefone):
+    if len(telefone) != 12:
+        print("O telefone deve conter exatamente 12 dígitos.")
+        return False
+    if not telefone.isdigit():
+        print("O telefone deve conter apenas números.")
+        return False
+    return True
 
+
+def cpf_unico(cursor, cpf):
     cursor.execute("SELECT cpf_cli FROM cliente WHERE cpf_cli = %s", (cpf,))
     if cursor.fetchone():
         print("Este CPF já está cadastrado na tabela cliente.")
@@ -54,7 +63,6 @@ def cpf_unico(cursor, cpf):
 
 
 def email_unico(cursor, email):
-
     cursor.execute(
         "SELECT email_cli FROM cliente WHERE email_cli = %s", (email,))
     if cursor.fetchone():
@@ -85,8 +93,14 @@ def cadastrar_cliente():
             break
 
     nome = input("Digite o nome do cliente: ")
+
+    while True:
+        telefone = input(
+            "Digite o telefone do cliente (exatamente 12 dígitos): ")
+        if validar_telefone(telefone):
+            break
+
     senha = input("Digite a senha do cliente: ")
-    telefone = input("Digite o telefone do cliente: ")
     cidade = input("Digite a cidade do cliente: ")
 
     torce_flamengo = solicitar_input_valido(
