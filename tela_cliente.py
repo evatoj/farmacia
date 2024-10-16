@@ -1,4 +1,5 @@
 from conexao import conectar_banco
+from tela_compra import tela_compra  # Importa o novo arquivo que lida com a tela de compra
 
 # Carrinho de compras do cliente (dicionário com ID do medicamento e quantidade)
 carrinho = {}
@@ -24,7 +25,7 @@ def tela_cliente(email):
         elif opcao == '4':
             retirar_med_carrinho()
         elif opcao == '5':
-            efetuar_compra()
+            efetuar_compra(email)  # Passa o email do cliente para a função
         elif opcao == '6':
             print("Retornando ao Menu Inicial...\n")
             break
@@ -137,31 +138,10 @@ def retirar_med_carrinho():
         print("O carrinho está vazio.")
 
 
-def efetuar_compra():
+def efetuar_compra(email_cliente):
     if not carrinho:
         print("Seu carrinho está vazio. Adicione medicamentos antes de comprar.")
         return
 
-    db = conectar_banco()
-    cursor = db.cursor()
-
-    for id_med, quantidade in carrinho.items():
-        # Verifica estoque diretamente na tabela 'medicamento', pois a view não pode ser atualizada
-        cursor.execute("SELECT estoque FROM medicamento WHERE id_med = %s", (id_med,))
-        resultado = cursor.fetchone()
-        if resultado and resultado[0] >= quantidade:
-            # Atualiza o estoque na tabela 'medicamento' diretamente
-            cursor.execute("UPDATE medicamento SET estoque = estoque - %s WHERE id_med = %s", (quantidade, id_med))
-            print(f"Compra de {quantidade}x do medicamento ID {id_med} realizada.")
-        else:
-            print(f"Estoque insuficiente para o medicamento ID {id_med}.")
-            db.rollback()
-            cursor.close()
-            db.close()
-            return
-
-    db.commit()  # Confirma todas as atualizações
-    cursor.close()
-    db.close()
-    carrinho.clear()
-    print("Compra efetuada com sucesso!")
+    # Passa o carrinho e o email do cliente para a tela de compra
+    tela_compra(email_cliente, carrinho)

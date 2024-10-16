@@ -62,3 +62,12 @@ CREATE TABLE `gerente` (
   UNIQUE KEY `cpf_ger_UNIQUE` (`cpf_ger`),
   UNIQUE KEY `email_ger_UNIQUE` (`email_ger`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `compra` (
+    id_compra int PRIMARY KEY,
+    nome_vendedor varchar(100),
+    nome_cliente varchar(100),
+    medicamento int,
+    quantidade int,
+    data_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
