@@ -64,3 +64,34 @@ CREATE TABLE `gerente` (
   UNIQUE KEY `cpf_ger_UNIQUE` (`cpf_ger`),
   UNIQUE KEY `email_ger_UNIQUE` (`email_ger`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+-- Tabela compra --
+
+CREATE TABLE `compra` (
+  `id_compra` int NOT NULL AUTO_INCREMENT,
+  `id_cli` int NOT NULL,
+  `id_ven` int NOT NULL,
+  `forma_pagamento` enum('a','b','c','d') NOT NULL,
+  `status` enum('confirmada','pendente','cancelada') DEFAULT 'pendente',
+  `valor_total` decimal(10,2) DEFAULT '0.00',
+  PRIMARY KEY (`id_compra`),
+  KEY `id_cli` (`id_cli`),
+  KEY `id_ven` (`id_ven`),
+  CONSTRAINT `compra_ibfk_1` FOREIGN KEY (`id_cli`) REFERENCES `cliente` (`id_cli`),
+  CONSTRAINT `compra_ibfk_2` FOREIGN KEY (`id_ven`) REFERENCES `vendedor` (`id_ven`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+-- Tabela item_compra --
+
+CREATE TABLE `item_compra` (
+  `id_item` int NOT NULL AUTO_INCREMENT,
+  `id_compra` int NOT NULL,
+  `id_med` int NOT NULL,
+  `quantidade` int NOT NULL,
+  `preco_unitario` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id_item`),
+  KEY `id_compra` (`id_compra`),
+  KEY `id_med` (`id_med`),
+  CONSTRAINT `item_compra_ibfk_1` FOREIGN KEY (`id_compra`) REFERENCES `compra` (`id_compra`),
+  CONSTRAINT `item_compra_ibfk_2` FOREIGN KEY (`id_med`) REFERENCES `medicamento` (`id_med`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
