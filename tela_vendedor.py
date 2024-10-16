@@ -12,7 +12,8 @@ def tela_vendedor():
         print("2. Buscar Medicamentos")
         print("3. Listar Medicamentos com Estoque Baixo")
         print("4. Listar Medicamentos sem Estoque Disponível")
-        print("5. Menu Inicial")
+        print("5. Confirmar Compras dos Clientes")
+        print("6. Menu Inicial")
 
         opcao = input("Escolha uma opção: ")
 
@@ -33,36 +34,51 @@ def tela_vendedor():
                     estoque = int(input("Digite a quantidade em estoque: "))
                     preco = float(input("Digite o preço: "))
 
-                    cursor.execute("""INSERT INTO medicamento (nome_med, fabricante, estoque, preco)
-                                      VALUES (%s, %s, %s, %s)""", (nome, fabricante, estoque, preco))
-                    db.commit()
-                    print("Medicamento inserido com sucesso!")
+                    try:
+                        cursor.execute("""
+                            INSERT INTO medicamento (nome_med, fabricante, estoque, preco)
+                            VALUES (%s, %s, %s, %s)""", (nome, fabricante, estoque, preco))
+                        db.commit()
+                        print("Medicamento inserido com sucesso!")
+                    except Exception as e:
+                        print(f"Erro ao inserir medicamento: {e}")
 
                 elif opcao_estoque == '2':
                     id_med = int(input("Digite o ID do medicamento: "))
                     novo_preco = float(input("Digite o novo preço: "))
-                    cursor.execute("""UPDATE medicamento SET preco = %s WHERE id_med = %s""",
-                                   (novo_preco, id_med))
-                    db.commit()
-                    print("Preço atualizado com sucesso!")
+                    try:
+                        cursor.execute("""
+                            UPDATE medicamento SET preco = %s WHERE id_med = %s""",
+                                       (novo_preco, id_med))
+                        db.commit()
+                        print("Preço atualizado com sucesso!")
+                    except Exception as e:
+                        print(f"Erro ao atualizar preço: {e}")
 
                 elif opcao_estoque == '3':
                     id_med = int(
                         input("Digite o ID do medicamento que deseja remover: "))
-                    cursor.execute(
-                        "DELETE FROM medicamento WHERE id_med = %s", (id_med,))
-                    db.commit()
-                    print("Medicamento removido com sucesso!")
+                    try:
+                        cursor.execute(
+                            "DELETE FROM medicamento WHERE id_med = %s", (id_med,))
+                        db.commit()
+                        print("Medicamento removido com sucesso!")
+                    except Exception as e:
+                        print(f"Erro ao remover medicamento: {e}")
 
                 elif opcao_estoque == '4':
                     id_med = int(
                         input("Digite o ID do medicamento para atualizar o estoque: "))
                     novo_estoque = int(
                         input("Digite a nova quantidade em estoque: "))
-                    cursor.execute("""UPDATE medicamento SET estoque = %s WHERE id_med = %s""",
-                                   (novo_estoque, id_med))
-                    db.commit()
-                    print("Estoque atualizado com sucesso!")
+                    try:
+                        cursor.execute("""
+                            UPDATE medicamento SET estoque = %s WHERE id_med = %s""",
+                                       (novo_estoque, id_med))
+                        db.commit()
+                        print("Estoque atualizado com sucesso!")
+                    except Exception as e:
+                        print(f"Erro ao atualizar estoque: {e}")
 
                 elif opcao_estoque == '5':
                     break
@@ -187,6 +203,40 @@ def tela_vendedor():
                 print("Nenhum medicamento com estoque zerado.")
 
         elif opcao == '5':
+            while True:
+                print("\n=== Confirmar Compras ===")
+                cursor.execute(
+                    "SELECT * FROM compra WHERE status = 'pendente'")
+                compras_pendentes = cursor.fetchall()
+
+                if compras_pendentes:
+                    print("Compras pendentes:")
+                    table = PrettyTable()
+                    table.field_names = ["ID Compra",
+                                         "ID Cliente", "Data", "Status"]
+                    for compra in compras_pendentes:
+                        table.add_row(
+                            [compra[0], compra[1], compra[2], compra[3]])
+                    print(table)
+
+                    id_compra = int(
+                        input("Digite o ID da compra que deseja confirmar (ou 0 para voltar): "))
+                    if id_compra == 0:
+                        break
+
+                    try:
+                        cursor.execute(
+                            "UPDATE compra SET status = 'confirmada' WHERE id_compra = %s", (id_compra,))
+                        db.commit()
+                        print("Compra confirmada com sucesso!")
+                    except Exception as e:
+                        print(f"Erro ao confirmar compra: {e}")
+
+                else:
+                    print("Não há compras pendentes.")
+                    break
+
+        elif opcao == '6':
             print("Retornando ao Menu Inicial...\n")
             break
 
