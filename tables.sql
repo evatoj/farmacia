@@ -76,3 +76,6 @@ CREATE TABLE IF NOT EXISTS `compra` (
   FOREIGN KEY (`id_ven`) REFERENCES vendedor(`id_ven`),
   FOREIGN KEY (`id_med`) REFERENCES medicamento(`id_med`)
 );
+
+ALTER TABLE compra
+MODIFY COLUMN data_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
