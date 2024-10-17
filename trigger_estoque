@@ -1,0 +1,16 @@
+DELIMITER //
+
+CREATE TRIGGER atualizar_estoque 
+AFTER UPDATE ON compra
+FOR EACH ROW
+BEGIN
+    -- Verifica se o status de pagamento foi alterado para 'confirmada'
+    IF NEW.status_pagamento = 'confirmada' THEN
+        -- Atualiza o estoque do medicamento, subtraindo a quantidade comprada
+        UPDATE medicamento
+        SET estoque = estoque - NEW.quantidade
+        WHERE id_med = NEW.id_med;
+    END IF;
+END//
+
+DELIMITER ;
