@@ -2,7 +2,7 @@ from conexao import conectar_banco
 from prettytable import PrettyTable
 
 
-def tela_vendedor():
+def tela_vendedor(vendedor_id):
     db = conectar_banco()
     cursor = db.cursor()
 
@@ -202,15 +202,16 @@ def tela_vendedor():
         elif opcao == '5':
             while True:
                 print("\n=== Confirmar Compras ===")
+
                 cursor.execute(
-                    "SELECT * FROM compra WHERE status = 'pendente'")
+                    "SELECT * FROM compra WHERE status = 'pendente' AND id_ven = %s", (vendedor_id,))
                 compras_pendentes = cursor.fetchall()
 
                 if compras_pendentes:
                     print("Compras pendentes:")
                     table = PrettyTable()
-                    table.field_names = ["ID Compra",
-                                         "ID Cliente", "Valor Total", "Forma de Pagamento"]
+                    table.field_names = [
+                        "ID Compra", "ID Cliente", "Valor Total", "Forma de Pagamento"]
 
                     for compra in compras_pendentes:
                         table.add_row(
@@ -221,6 +222,19 @@ def tela_vendedor():
                         input("Digite o ID da compra que deseja confirmar (ou 0 para voltar): "))
                     if id_compra == 0:
                         break
+
+                    cursor.execute(
+                        "SELECT id_ven FROM compra WHERE id_compra = %s", (id_compra,))
+                    compra_selecionada = cursor.fetchone()
+
+                    if not compra_selecionada:
+                        print("Compra não encontrada.")
+                        continue
+
+                    if compra_selecionada[0] != vendedor_id:
+                        print(
+                            "Você não tem permissão para confirmar compras associadas a outros vendedores.")
+                        continue
 
                     cursor.execute(
                         "SELECT id_med, quantidade FROM item_compra WHERE id_compra = %s", (id_compra,))
@@ -241,33 +255,29 @@ def tela_vendedor():
                             estoque_suficiente = False
                             break
 
-                    if not estoque_suficiente:
-                        print(
-                            "A compra não pode ser confirmada devido à falta de estoque em um ou mais itens.")
-                        continue
-
-                    try:
-                        for id_med, quantidade in itens_compra:
-                            cursor.execute("""
-                                UPDATE medicamento
-                                SET estoque = estoque - %s
-                                WHERE id_med = %s
-                            """, (quantidade, id_med))
+                    if estoque_suficiente:
 
                         cursor.execute(
                             "UPDATE compra SET status = 'confirmada' WHERE id_compra = %s", (id_compra,))
                         db.commit()
-                        print("Compra confirmada com sucesso e estoque atualizado!")
-                    except Exception as e:
+                        print("Compra confirmada com sucesso!")
+
+                        for id_med, quantidade in itens_compra:
+                            cursor.execute(
+                                "UPDATE medicamento SET estoque = estoque - %s WHERE id_med = %s",
+                                (quantidade, id_med))
+                        db.commit()
+                        print("Estoque atualizado!")
+                    else:
                         print(
-                            f"Erro ao confirmar compra e atualizar estoque: {e}")
+                            "A compra não pode ser confirmada devido à falta de estoque.")
 
                 else:
-                    print("Não há compras pendentes.")
+                    print("Nenhuma compra pendente para confirmar.")
                     break
 
         elif opcao == '6':
-            print("Voltando ao menu inicial...")
+            print("Saindo...")
             break
         else:
             print("Opção inválida! Tente novamente.")

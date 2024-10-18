@@ -30,8 +30,11 @@ def main():
                 tela_cliente(email_cliente)
         elif opcao == '3':
             print("=== Login do Vendedor ===")
-            if login_vendedor():
-                tela_vendedor()
+            id_ven = login_vendedor()
+            if id_ven:
+                tela_vendedor(id_ven)
+            else:
+                print("Login do vendedor falhou. Tente novamente.")
         elif opcao == '4':
             print("=== Login do Gerente ===")
             if login_gerente():
