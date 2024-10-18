@@ -190,9 +190,6 @@ def buscar_por_fabricante(fabricante):
     db.close()
 
 
-# ... outras importações ...
-
-
 def realizar_compra(email):
     db = conectar_banco()
     cursor = db.cursor()
@@ -208,12 +205,10 @@ def realizar_compra(email):
 
     id_cliente = cliente[0]
 
-    # Verifica se o cliente tem direito ao desconto
     cursor.execute(
         "SELECT torce_flamengo, cidade_cli, assiste_one_piece FROM cliente WHERE id_cli = %s", (id_cliente,))
     dados_cliente = cursor.fetchone()
 
-    # Assumindo que torce_flamengo e assiste_one_piece são 0 ou 1
     torce_flamengo, cidade, assiste_one_piece = dados_cliente
 
     cursor.execute(
@@ -235,7 +230,7 @@ def realizar_compra(email):
     itens_compra = []
     while True:
         cursor.execute(
-            "SELECT id_med, nome_med, estoque, preco FROM medicamento")
+            "SELECT id_med, nome_med, estoque, preco FROM medicamento WHERE estoque > 0")
         produtos = cursor.fetchall()
 
         table = PrettyTable()
@@ -248,26 +243,32 @@ def realizar_compra(email):
         print(table)
 
         id_med = int(input("Digite o ID do medicamento que deseja comprar: "))
-        quantidade = int(input("Digite a quantidade: "))
 
         cursor.execute(
             "SELECT estoque, preco FROM medicamento WHERE id_med = %s", (id_med,))
         resultado = cursor.fetchone()
 
-        if resultado:
-            estoque_disponivel, preco_unitario = resultado
-            if quantidade > estoque_disponivel:
-                print("Quantidade solicitada excede o estoque disponível.")
-                continue
+        if resultado is None:
+            print("Este medicamento não existe.")
+            continue
 
-            itens_compra.append((id_med, quantidade, preco_unitario))
-            print("Item adicionado à compra.")
+        estoque_disponivel, preco_unitario = resultado
+        if estoque_disponivel <= 0:
+            print("Este medicamento está indisponível no momento.")
+            continue
 
-            continuar = input("Deseja adicionar mais itens? (s/n): ")
-            if continuar.lower() != 's':
-                break
-        else:
-            print("Medicamento não encontrado.")
+        quantidade = int(input("Digite a quantidade: "))
+
+        if quantidade > estoque_disponivel:
+            print("Quantidade solicitada excede o estoque disponível.")
+            continue
+
+        itens_compra.append((id_med, quantidade, preco_unitario))
+        print("Item adicionado à compra.")
+
+        continuar = input("Deseja adicionar mais itens? (s/n): ")
+        if continuar.lower() != 's':
+            break
 
     print("\n=== Formas de Pagamento ===")
     for forma in FormaPagamento:
@@ -283,13 +284,12 @@ def realizar_compra(email):
         db.close()
         return
 
-    # Calcula o valor total da compra
     valor_total = sum(Decimal(qtd) * Decimal(preco)
                       for _, qtd, preco in itens_compra)
 
-    desconto = Decimal('0.0')  # Inicializa desconto como Decimal
+    desconto = Decimal('0.0')
     if torce_flamengo == 1 or cidade == "Sousa" or assiste_one_piece == 1:
-        desconto = valor_total * Decimal('0.10')  # 10% de desconto
+        desconto = valor_total * Decimal('0.10')
 
     valor_total_com_desconto = valor_total - desconto
 
@@ -301,12 +301,10 @@ def realizar_compra(email):
         cursor.execute(
             "INSERT INTO item_compra (id_compra, id_med, quantidade, preco_unitario) VALUES (%s, %s, %s, %s)",
             (id_compra, id_med, quantidade, preco_unitario))
-        cursor.execute(
-            "UPDATE medicamento SET estoque = estoque - %s WHERE id_med = %s", (quantidade, id_med))
 
     db.commit()
     print(f"Compra realizada com sucesso! Valor total: R$ {
-          valor_total_com_desconto:.2f} (Desconto aplicado: R$ {desconto:.2f})")
+          valor_total_com_desconto:.2f} (Desconto aplicado: R$ {desconto:.2f})\nAguarde até que seu vendedor confirme sua compra.")
 
     cursor.close()
     db.close()
