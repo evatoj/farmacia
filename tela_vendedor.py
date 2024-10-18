@@ -208,7 +208,6 @@ def tela_vendedor(id_vendedor):
 
             if vendedor:
                 id_vendedor = vendedor[0]  # Extrai o valor de 'id_ven' da tupla
-                print(id_vendedor)
                 confirmar_compras(id_vendedor)
             else:
                 print("Vendedor não encontrado.")
@@ -238,7 +237,7 @@ def confirmar_compras(id_vendedor):
         if compras_pendentes:
             print("Compras pendentes:")
             table = PrettyTable()
-            table.field_names = ["ID Compra", "ID Cliente", "Data", "Status"]
+            table.field_names = ["ID Compra", "ID Cliente", "Status", "Data"]
             for compra in compras_pendentes:
                 table.add_row([compra[0], compra[1], compra[2], compra[3]])
             print(table)
@@ -249,33 +248,32 @@ def confirmar_compras(id_vendedor):
 
             try:
                 # Corrige a query para buscar as colunas necessárias
-                cursor.execute("SELECT id_med, quantidade FROM compra WHERE id_compra = %s", (id_compra,))
+                cursor.execute("SELECT id_med, quantidade FROM compra WHERE id_compra = %s AND id_ven = %s", (id_compra, id_vendedor,))
                 dados_compra = cursor.fetchone()
 
-                if dados_compra:  # Verifica se a compra existe
-                    id_medicamento = dados_compra[0]  # id_med é o primeiro
-                    quantidade = dados_compra[1]  # quantidade é o segundo
+                if dados_compra is None:  # Verifica se a compra existe
+                    print("Compra não encontrada. Verifique o ID.")
+                    return
+                
+                #id_medicamento = dados_compra[0]  # id_med é o primeiro
+                #quantidade = dados_compra[1]  # quantidade é o segundo
 
-                    # Atualiza o status da compra para 'confirmada'
-                    cursor.execute(
-                        "UPDATE compra SET status_pagamento = 'confirmada' WHERE id_compra = %s AND id_ven = %s",
-                        (id_compra, id_vendedor,)
-                    )
 
-                    # Atualiza o estoque do medicamento
-                    cursor.execute(
-                        "UPDATE medicamento SET estoque = estoque - %s WHERE id_med = %s",
-                        (quantidade, id_medicamento,)
-                    )
+                # Atualiza o status da compra para 'confirmada'
+                cursor.execute(
+                    "UPDATE compra SET status_pagamento = 'confirmada' WHERE id_compra = %s",
+                    (id_compra,)
+                )
 
-                    db.commit()
-                    print("Compra confirmada com sucesso!")
-                else:
-                    print("Compra não encontrada ou já confirmada.")
+                db.commit()
+                print("Compra confirmada com sucesso!")
 
+            #else:
+             #   print(f"Compra com ID {id_compra} não encontrada.")
             except Exception as e:
-                print(f"Erro ao confirmar compra: {e}")
-                db.rollback()  # Desfaz alterações em caso de erro
+                db.rollback()  # Reverte alterações em caso de erro
+                print(f"Erro ao confirmar compra e atualizar estoque: {e}")
+
 
         else:
             print("Não há compras pendentes.")
