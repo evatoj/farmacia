@@ -17,7 +17,8 @@ def tela_cliente(email):
         print("1. Ver dados cadastrais")
         print("2. Buscar Medicamentos")
         print("3. Realizar Compra")
-        print("4. Menu Inicial")
+        print("4. Visualizar pedidos")
+        print("5. Menu Inicial")
 
         opcao = input("Escolha uma opção: ")
 
@@ -28,6 +29,8 @@ def tela_cliente(email):
         elif opcao == '3':
             realizar_compra(email)
         elif opcao == '4':
+            visualizar_pedidos(email)
+        elif opcao == '5':
             print("Retornando ao Menu Inicial...\n")
             break
         else:
@@ -81,6 +84,7 @@ def buscar_medicamentos():
 
         if opcao == '1':
             listar_todos_medicamentos()
+            break
         elif opcao == '2':
             nome_produto = input(
                 "Digite o nome do produto que deseja buscar: ")
@@ -241,7 +245,7 @@ def realizar_compra(email):
     itens_compra = []
     while True:
         cursor.execute(
-            "SELECT id_med, nome_med, estoque, preco FROM medicamento")
+            "SELECT id_med, nome_med, estoque, preco FROM medicamento WHERE estoque IS NOT NULL")
         produtos = cursor.fetchall()
 
         table = PrettyTable()
@@ -295,9 +299,10 @@ def realizar_compra(email):
         desconto = valor_total * Decimal('0.10')  # 10% de desconto
 
     valor_total_com_desconto = valor_total - desconto
+    print(f"Desconto aplicado: R$ {desconto:.2f}")
 
-    cursor.execute("INSERT INTO compra (id_cli, id_ven, forma_pagamento, valor_total, status_pagamento) VALUES (%s, %s, %s, %s, %s)",
-                   (id_cliente, id_vendedor, forma_pagamento, valor_total_com_desconto, status_pagamento))
+    cursor.execute("INSERT INTO compra (id_cli, id_ven, forma_pagamento, valor_total, status_pagamento, id_med, desconto_aplicado) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                   (id_cliente, id_vendedor, forma_pagamento, valor_total_com_desconto, status_pagamento, id_med, desconto,))
     id_compra = cursor.lastrowid
 
     for id_med, quantidade, preco_unitario in itens_compra:
@@ -307,15 +312,28 @@ def realizar_compra(email):
 
     db.commit()
     print(f"Sua compra está em processamento e o vendedor irá confirmá-la em breve! Valor total: R$ {
-          valor_total_com_desconto:.2f} (Desconto aplicado: R$ {desconto:.2f})")
+          valor_total_com_desconto:.2f}")
 
     cursor.close()
     db.close()
 
-############
-
 def visualizar_pedidos(email):
     db = conectar_banco()
     cursor = db.cursor()
-    cursor.execute(
-            "UPDATE medicamento SET estoque = estoque - %s WHERE id_med = %s", (quantidade, id_med))
+    cursor.execute("SELECT id_cli FROM cliente WHERE email_cli = %s", (email,))
+    id_cli = cursor.fetchone()[0]
+
+    cursor.execute("SELECT * FROM compra WHERE id_cli = %s", (id_cli,))
+    pedidos = cursor.fetchall()
+
+    table = PrettyTable()
+    table.field_names = ["ID Compra", "ID Cliente", "ID Vendedor", "Data da compra", "ID Medicamento", "Desconto aplicado", "Valor total", "Forma de pagamento", "Status do pagamento", "Quantidade"]
+
+    if pedidos:
+        for pedido in pedidos:
+            id_compra, id_cli, id_ven, data_compra, id_med, desconto_aplicado, valor_total, forma_pagamento, status_pagamento, quantidade = pedido
+            table.add_row([id_compra, id_cli, id_ven, data_compra, id_med, desconto_aplicado, valor_total, forma_pagamento, status_pagamento, quantidade])
+        print(table)
+
+    cursor.close()
+    db.close()
