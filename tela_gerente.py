@@ -14,7 +14,8 @@ def tela_gerente():
         print("5. Demitir Vendedor")
         print("6. Recontratar Vendedor")
         print("7. Alterar Salário de Vendedor")
-        print("8. Menu Inicial")
+        print("8. Emitir Relatório de Vendas de um Vendedor")
+        print("9. Menu Inicial")
 
         opcao = input("Escolha uma opção: ")
 
@@ -33,6 +34,8 @@ def tela_gerente():
         elif opcao == '7':
             alterar_salario_vendedor()
         elif opcao == '8':
+            emitir_relatorio_vendas()
+        elif opcao == '9':
             print("Retornando ao Menu Inicial...\n")
             break
         else:
@@ -282,6 +285,57 @@ def alterar_salario_vendedor():
             print("Vendedor não encontrado.")
     except ValueError:
         print("Valor inválido para o salário.")
+
+    cursor.close()
+    db.close()
+
+
+def emitir_relatorio_vendas():
+    db = conectar_banco()
+    cursor = db.cursor()
+
+    id_vendedor = input("Digite o ID do vendedor para emitir o relatório: ")
+
+    try:
+        cursor.callproc('relatorio_venda', (id_vendedor,))
+
+        total_result = None
+        vendas = []
+
+        for resultado in cursor.stored_results():
+            if total_result is None:
+                total_result = resultado.fetchall()
+            else:
+                vendas = resultado.fetchall()
+
+        if total_result:
+            if len(total_result[0]) == 3:
+                total_vendas, total_valor, total_clientes = total_result[0]
+
+                print(f"\nTotal de Vendas: {total_vendas}")
+                print(f"Valor Total de Vendas: R$ {total_valor:.2f}")
+                print(f"Número Total de Clientes Atendidos: {total_clientes}")
+
+                if vendas:
+                    table = PrettyTable()
+                    table.field_names = ["Forma de Pagamento", "Frequência"]
+
+                    for venda in vendas:
+                        forma_pagamento, quantidade = venda
+                        table.add_row([forma_pagamento, quantidade])
+
+                    print("\n=== Frequência de Formas de Pagamento ===")
+                    print(table)
+                else:
+                    print("Nenhuma venda encontrada para este vendedor.")
+            else:
+                print(
+                    "A consulta de totais retornou um número inesperado de resultados:", total_result)
+        else:
+            print("Nenhum dado de total encontrado para este vendedor.")
+
+    except Exception as e:
+        print(f"Erro ao emitir relatório: {e}")
 
     cursor.close()
     db.close()
