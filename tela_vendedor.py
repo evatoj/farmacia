@@ -204,7 +204,7 @@ def tela_vendedor(vendedor_id):
                 print("\n=== Confirmar Compras ===")
 
                 cursor.execute(
-                    "SELECT * FROM compra WHERE status = 'pendente' AND id_ven = %s", (vendedor_id,))
+                    "SELECT * FROM compra WHERE status_com = 'pendente' AND id_ven = %s", (vendedor_id,))
                 compras_pendentes = cursor.fetchall()
 
                 if compras_pendentes:
@@ -258,7 +258,7 @@ def tela_vendedor(vendedor_id):
                     if estoque_suficiente:
 
                         cursor.execute(
-                            "UPDATE compra SET status = 'confirmada' WHERE id_compra = %s", (id_compra,))
+                            "UPDATE compra SET status_com = 'confirmada' WHERE id_compra = %s", (id_compra,))
                         db.commit()
                         print("Compra confirmada com sucesso!")
 

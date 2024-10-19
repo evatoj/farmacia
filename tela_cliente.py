@@ -17,7 +17,8 @@ def tela_cliente(email):
         print("1. Ver dados cadastrais")
         print("2. Buscar Medicamentos")
         print("3. Realizar Compra")
-        print("4. Menu Inicial")
+        print("4. Ver Compras Pendentes")
+        print("5. Menu Inicial")
 
         opcao = input("Escolha uma opção: ")
 
@@ -28,6 +29,8 @@ def tela_cliente(email):
         elif opcao == '3':
             realizar_compra(email)
         elif opcao == '4':
+            ver_compras_pendentes(email)
+        elif opcao == '5':
             print("Retornando ao Menu Inicial...\n")
             break
         else:
@@ -303,8 +306,46 @@ def realizar_compra(email):
             (id_compra, id_med, quantidade, preco_unitario))
 
     db.commit()
-    print(f"Compra realizada com sucesso! Valor total: R$ {
+    print(f"Compra solicitada com sucesso! Valor total: R$ {
           valor_total_com_desconto:.2f} (Desconto aplicado: R$ {desconto:.2f})\nAguarde até que seu vendedor confirme sua compra.")
+
+    cursor.close()
+    db.close()
+
+
+def ver_compras_pendentes(email):
+    db = conectar_banco()
+    cursor = db.cursor()
+
+    cursor.execute("SELECT id_cli FROM cliente WHERE email_cli = %s", (email,))
+    cliente = cursor.fetchone()
+
+    if not cliente:
+        print("Cliente não encontrado.")
+        cursor.close()
+        db.close()
+        return
+
+    id_cliente = cliente[0]
+
+    cursor.execute(
+        "SELECT id_compra, id_ven, forma_pagamento, valor_total FROM compra_pendente WHERE id_cli = %s", (id_cliente,))
+    compras_pendentes = cursor.fetchall()
+
+    if compras_pendentes:
+        table = PrettyTable()
+        table.field_names = ["ID Compra", "ID Vendedor",
+                             "Forma de Pagamento", "Valor Total (R$)"]
+
+        for compra in compras_pendentes:
+            id_compra, id_vendedor, forma_pagamento, valor_total = compra
+            table.add_row(
+                [id_compra, id_vendedor, forma_pagamento, valor_total])
+
+        print("\n=== Compras Pendentes ===")
+        print(table)
+    else:
+        print("Não há compras pendentes.")
 
     cursor.close()
     db.close()

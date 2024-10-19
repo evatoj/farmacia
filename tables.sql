@@ -72,7 +72,7 @@ CREATE TABLE `compra` (
   `id_cli` int NOT NULL,
   `id_ven` int NOT NULL,
   `forma_pagamento` enum('a','b','c','d') NOT NULL,
-  `status` enum('confirmada','pendente','cancelada') DEFAULT 'pendente',
+  `status_com` enum('confirmada','pendente','cancelada') DEFAULT 'pendente',
   `valor_total` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`id_compra`),
   KEY `id_cli` (`id_cli`),

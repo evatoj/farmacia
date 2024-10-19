@@ -29,3 +29,10 @@ CREATE VIEW vendedor_demitido AS
 SELECT id_ven, cpf_ven, nome_ven, email_ven, cidade_ven, telefone_ven
 FROM vendedor
 WHERE status_ven = 0;
+
+-- View para verificar compras pendentes do cliente logado --
+
+CREATE VIEW compra_pendente AS
+SELECT id_compra, id_cli, id_ven, forma_pagamento, valor_total
+FROM compra
+WHERE status_com = 'pendente';
