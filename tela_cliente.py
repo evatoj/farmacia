@@ -17,8 +17,9 @@ def tela_cliente(email):
         print("1. Ver dados cadastrais")
         print("2. Buscar Medicamentos")
         print("3. Realizar Compra")
-        print("4. Ver Compras Pendentes")
-        print("5. Menu Inicial")
+        print("4. Ver Minhas Compras Pendentes")
+        print("5. Ver Meu Histórico de Compras")
+        print("6. Menu Inicial")
 
         opcao = input("Escolha uma opção: ")
 
@@ -31,6 +32,8 @@ def tela_cliente(email):
         elif opcao == '4':
             ver_compras_pendentes(email)
         elif opcao == '5':
+            ver_historico_compras(email)
+        elif opcao == '6':
             print("Retornando ao Menu Inicial...\n")
             break
         else:
@@ -346,6 +349,59 @@ def ver_compras_pendentes(email):
         print(table)
     else:
         print("Não há compras pendentes.")
+
+    cursor.close()
+    db.close()
+
+
+def ver_historico_compras(email):
+    db = conectar_banco()
+    cursor = db.cursor()
+
+    cursor.execute("SELECT id_cli FROM cliente WHERE email_cli = %s", (email,))
+    cliente = cursor.fetchone()
+
+    if not cliente:
+        print("Cliente não encontrado.")
+        cursor.close()
+        db.close()
+        return
+
+    id_cliente = cliente[0]
+
+    cursor.execute("""
+        SELECT c.id_compra, v.nome_ven, c.forma_pagamento, c.valor_total
+        FROM compra c
+        JOIN vendedor v ON c.id_ven = v.id_ven
+        WHERE c.id_cli = %s AND c.status_com = 'confirmada'
+        ORDER BY c.id_compra DESC
+    """, (id_cliente,))
+    historico_compras = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT COUNT(*), SUM(c.valor_total)
+        FROM compra c
+        WHERE c.id_cli = %s AND c.status_com = 'confirmada'
+    """, (id_cliente,))
+    total_compras, total_gasto = cursor.fetchone()
+
+    if historico_compras:
+        table = PrettyTable()
+        table.field_names = ["ID Compra", "Vendedor",
+                             "Forma de Pagamento", "Valor Total (R$)"]
+
+        for compra in historico_compras:
+            id_compra, nome_vendedor, forma_pagamento, valor_total = compra
+            table.add_row([id_compra, nome_vendedor,
+                          forma_pagamento, valor_total])
+
+        print("\n=== Histórico de Compras ===")
+        print(table)
+    else:
+        print("Você não possui histórico de compras confirmadas.")
+
+    print(f"\nTotal de Compras Confirmadas: {total_compras}")
+    print(f"Total Gasto em Compras: R$ {total_gasto:.2f}")
 
     cursor.close()
     db.close()
