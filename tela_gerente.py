@@ -294,9 +294,36 @@ def emitir_relatorio_vendas():
     db = conectar_banco()
     cursor = db.cursor()
 
-    id_vendedor = input("Digite o ID do vendedor para emitir o relatório: ")
-
     try:
+        cursor.execute("SELECT id_ven, nome_ven FROM vendedor")
+        vendedores = cursor.fetchall()
+
+        if vendedores:
+            tabela_vendedores = PrettyTable()
+            tabela_vendedores.field_names = ["ID do Vendedor", "Nome"]
+
+            for vendedor in vendedores:
+                id_vendedor, nome_vendedor = vendedor
+                tabela_vendedores.add_row([id_vendedor, nome_vendedor])
+
+            print("\n=== Vendedores Cadastrados ===")
+            print(tabela_vendedores)
+        else:
+            print("Nenhum vendedor cadastrado.")
+            return
+
+        id_vendedor = input(
+            "Digite o ID do vendedor para emitir o relatório: ")
+
+        vendedor_encontrado = any(id_vendedor == str(v[0]) for v in vendedores)
+
+        if not vendedor_encontrado:
+            print(f"Vendedor com ID {id_vendedor} não encontrado.")
+            return
+
+        nome_vendedor = next(v[1]
+                             for v in vendedores if str(v[0]) == id_vendedor)
+
         cursor.callproc('relatorio_venda', (id_vendedor,))
 
         total_result = None
@@ -312,7 +339,9 @@ def emitir_relatorio_vendas():
             if len(total_result[0]) == 3:
                 total_vendas, total_valor, total_clientes = total_result[0]
 
-                print(f"\nTotal de Vendas: {total_vendas}")
+                print(f"\n=== Relatório de vendas do vendedor '{
+                      nome_vendedor}' (ID = {id_vendedor}) ===")
+                print(f"Total de Vendas: {total_vendas}")
                 print(f"Valor Total de Vendas: R$ {total_valor:.2f}")
                 print(f"Número Total de Clientes Atendidos: {total_clientes}")
 
@@ -337,5 +366,6 @@ def emitir_relatorio_vendas():
     except Exception as e:
         print(f"Erro ao emitir relatório: {e}")
 
-    cursor.close()
-    db.close()
+    finally:
+        cursor.close()
+        db.close()
