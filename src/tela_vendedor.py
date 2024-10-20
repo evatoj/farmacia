@@ -211,11 +211,13 @@ def tela_vendedor(vendedor_id):
                     print("Compras pendentes:")
                     table = PrettyTable()
                     table.field_names = [
-                        "ID Compra", "ID Cliente", "Valor Total", "Forma de Pagamento"]
+                        "ID Compra", "ID Cliente", "Valor Total", "Forma de Pagamento"
+                    ]
 
                     for compra in compras_pendentes:
                         table.add_row(
-                            [compra[0], compra[1], compra[5], compra[3]])
+                            [compra[0], compra[1], compra[5], compra[3]]
+                        )
                     print(table)
 
                     id_compra = int(
@@ -237,41 +239,9 @@ def tela_vendedor(vendedor_id):
                         continue
 
                     cursor.execute(
-                        "SELECT id_med, quantidade FROM item_compra WHERE id_compra = %s", (id_compra,))
-                    itens_compra = cursor.fetchall()
-
-                    if not itens_compra:
-                        print("Não há itens para esta compra.")
-                        continue
-
-                    estoque_suficiente = True
-                    for id_med, quantidade in itens_compra:
-                        cursor.execute(
-                            "SELECT estoque FROM medicamento WHERE id_med = %s", (id_med,))
-                        estoque_disponivel = cursor.fetchone()
-                        if estoque_disponivel and estoque_disponivel[0] < quantidade:
-                            print(
-                                f"Estoque insuficiente para o medicamento ID {id_med}.")
-                            estoque_suficiente = False
-                            break
-
-                    if estoque_suficiente:
-
-                        cursor.execute(
-                            "UPDATE compra SET status_com = 'confirmada' WHERE id_compra = %s", (id_compra,))
-                        db.commit()
-                        print("Compra confirmada com sucesso!")
-
-                        for id_med, quantidade in itens_compra:
-                            cursor.execute(
-                                "UPDATE medicamento SET estoque = estoque - %s WHERE id_med = %s",
-                                (quantidade, id_med))
-                        db.commit()
-                        print("Estoque atualizado!")
-                    else:
-                        print(
-                            "A compra não pode ser confirmada devido à falta de estoque.")
-
+                        "UPDATE compra SET status_com = 'confirmada' WHERE id_compra = %s", (id_compra,))
+                    db.commit()
+                    print("Compra confirmada com sucesso!")
                 else:
                     print("Nenhuma compra pendente para confirmar.")
                     break
