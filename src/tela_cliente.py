@@ -452,7 +452,11 @@ def ver_historico_compras(email):
         print("Você não possui histórico de compras confirmadas.")
 
     print(f"\nTotal de Compras Confirmadas: {total_compras}")
-    print(f"Total Gasto em Compras: R$ {total_gasto:.2f}")
+
+    if total_gasto is not None:
+        print(f"Total Gasto em Compras: R$ {total_gasto:.2f}")
+    else:
+        print("Total Gasto em Compras: R$ 0.00")
 
     cursor.close()
     db.close()
