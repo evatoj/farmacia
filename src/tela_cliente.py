@@ -234,6 +234,7 @@ def realizar_compra(email):
     id_vendedor = int(input("Escolha o ID do vendedor: "))
 
     itens_compra = []
+
     while True:
         cursor.execute(
             "SELECT id_med, nome_med, estoque, preco FROM medicamento WHERE estoque > 0")
@@ -272,9 +273,30 @@ def realizar_compra(email):
         itens_compra.append((id_med, quantidade, preco_unitario))
         print("Item adicionado à compra.")
 
+        mostrar_carrinho(itens_compra)
+
         continuar = input("Deseja adicionar mais itens? (s/n): ")
         if continuar.lower() != 's':
             break
+
+    while True:
+        remover_item = input("Deseja remover algum item do carrinho? (s/n): ")
+        if remover_item.lower() == 's':
+            id_remover = int(
+                input("Digite o ID do medicamento que deseja remover: "))
+
+            itens_compra = [(id_med, qtd, preco) for id_med, qtd,
+                            preco in itens_compra if id_med != id_remover]
+            print("Item removido do carrinho.")
+            mostrar_carrinho(itens_compra)
+        else:
+            break
+
+    if not itens_compra:
+        print("Carrinho vazio. Compra cancelada.")
+        cursor.close()
+        db.close()
+        return
 
     print("\n=== Formas de Pagamento ===")
     for forma in FormaPagamento:
@@ -299,6 +321,18 @@ def realizar_compra(email):
 
     valor_total_com_desconto = valor_total - desconto
 
+    print("\n=== Total do Carrinho ===")
+    mostrar_carrinho(itens_compra)
+    print(f"\nValor total da compra (com desconto aplicado): R$ {
+          valor_total_com_desconto:.2f}")
+
+    confirmar = input("Deseja confirmar a compra? (s/n): ")
+    if confirmar.lower() != 's':
+        print("Compra não confirmada. Retornando ao menu do cliente.")
+        cursor.close()
+        db.close()
+        return
+
     cursor.execute("INSERT INTO compra (id_cli, id_ven, forma_pagamento, valor_total) VALUES (%s, %s, %s, %s)",
                    (id_cliente, id_vendedor, forma_pagamento.value, valor_total_com_desconto))
     id_compra = cursor.lastrowid
@@ -309,11 +343,28 @@ def realizar_compra(email):
             (id_compra, id_med, quantidade, preco_unitario))
 
     db.commit()
-    print(f"Compra solicitada com sucesso! Valor total: R$ {
-          valor_total_com_desconto:.2f} (Desconto aplicado: R$ {desconto:.2f})\nAguarde até que seu vendedor confirme sua compra.")
+    print(f"Compra solicitada com sucesso! Valor total: R$ {valor_total_com_desconto:.2f} (Desconto aplicado: R$ {
+          desconto:.2f})\nAguarde até que seu vendedor confirme sua compra.")
 
     cursor.close()
     db.close()
+
+
+def mostrar_carrinho(itens_compra):
+    if not itens_compra:
+        print("O carrinho está vazio.")
+        return
+
+    table = PrettyTable()
+    table.field_names = ["ID Medicamento", "Quantidade",
+                         "Preço Unitário (R$)", "Subtotal (R$)"]
+
+    for id_med, quantidade, preco_unitario in itens_compra:
+        subtotal = Decimal(quantidade) * Decimal(preco_unitario)
+        table.add_row([id_med, quantidade, preco_unitario, subtotal])
+
+    print("\n=== Carrinho de Compras ===")
+    print(table)
 
 
 def ver_compras_pendentes(email):
